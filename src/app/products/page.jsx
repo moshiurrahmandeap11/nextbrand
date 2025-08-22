@@ -11,7 +11,7 @@ const ProductsPage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("https://nextbrand-five.vercel.app/api/products");
+        const response = await axios.get(`/api/products`);
         console.log("Fetched products:", response.data);
         setProducts(response.data);
         setError(null);

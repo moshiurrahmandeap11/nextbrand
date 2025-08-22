@@ -36,7 +36,7 @@ const AddProduct = () => {
 
     setLoading(true);
     try {
-      await axios.post("https://nextbrand-five.vercel.app/api/products", formData);
+      await axios.post(`/api/products`, formData);
       setSuccess(true);
       setFormData({ title: "", price: "", description: "" });
       setTimeout(() => router.push("/products"), 1500); // Redirect after 1.5s
