@@ -1,28 +1,33 @@
 "use client";
+
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react"; // Import client-side signOut here
+import { useSession, signOut } from "next-auth/react";
+import { usePathname } from "next/navigation";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session, status } = useSession();
+  const pathname = usePathname();
 
   const menuVariants = {
     open: { opacity: 1, x: 0 },
     closed: { opacity: 0, x: "-100%" },
   };
 
-  const navLinks = ["Products","Services", "About", "Contact"];
+  const navLinks = ["Products", "Services", "About", "Contact"];
 
   const handleLogout = () => {
-    signOut({ callbackUrl: "/" }); // Use client-side signOut with redirect
+    signOut({ callbackUrl: "/" });
   };
+
+  // Helper function to check if a link is active
+  const isActive = (link) => pathname === `/${link.toLowerCase()}`;
 
   return (
     <nav className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white shadow-lg sticky w-full top-0 z-50">
       <div className="container mx-auto flex items-center justify-between p-4">
-        
         {/* Logo */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -46,12 +51,18 @@ const Navbar = () => {
               >
                 <Link
                   href={`/${item.toLowerCase()}`}
-                  className="transition-colors duration-300"
+                  className={`transition-colors duration-300 ${
+                    isActive(item) ? "text-orange-400" : "hover:text-orange-300"
+                  }`}
+                  aria-current={isActive(item) ? "page" : undefined}
                 >
                   {item}
                 </Link>
-                {/* Animated underline */}
-                <span className="absolute left-0 -bottom-1 w-0 h-[3px] bg-orange-400 transition-all duration-300 group-hover:w-full"></span>
+                <span
+                  className={`absolute left-0 -bottom-1 h-[3px] bg-orange-400 transition-all duration-300 ${
+                    isActive(item) ? "w-full" : "w-0 group-hover:w-full"
+                  }`}
+                ></span>
               </motion.li>
             ))}
           </ul>
@@ -64,9 +75,15 @@ const Navbar = () => {
           >
             {status === "authenticated" ? (
               <div className="flex items-center space-x-4">
-                <span className="text-lg font-semibold text-orange-400">
+                <Link
+                  href="/dashboard"
+                  className={`text-lg font-semibold transition-colors duration-300 ${
+                    pathname === "/dashboard" ? "text-orange-400" : "text-orange-400 hover:text-orange-300"
+                  }`}
+                  aria-current={pathname === "/dashboard" ? "page" : undefined}
+                >
                   {session.user.name}
-                </span>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 px-4 py-2 rounded-full font-semibold text-sm uppercase tracking-wider transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-orange-500/25 active:scale-95"
@@ -96,7 +113,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <motion.div
-        className="md:hidden bg-gray-800 p-4 space-y-4 rounded-2xl"
+        className="md:hidden bg-gray-800/90 backdrop-blur-md p-4 space-y-4 rounded-2xl"
         initial="closed"
         animate={isOpen ? "open" : "closed"}
         variants={menuVariants}
@@ -107,13 +124,20 @@ const Navbar = () => {
             key={item}
             href={`/${item.toLowerCase()}`}
             onClick={() => setIsOpen(false)}
-            className="block relative group hover:text-orange-300 transition-colors"
+            className={`block relative group transition-colors duration-300 ${
+              isActive(item) ? "text-orange-400" : "hover:text-orange-300"
+            }`}
+            aria-current={isActive(item) ? "page" : undefined}
           >
             {item}
-            <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
+            <span
+              className={`absolute left-0 bottom-0 h-[2px] bg-yellow-400 transition-all duration-300 ${
+                isActive(item) ? "w-full" : "w-0 group-hover:w-full"
+              }`}
+            ></span>
           </Link>
         ))}
-        
+
         {/* Mobile User Info or Get Started Button */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -123,9 +147,16 @@ const Navbar = () => {
         >
           {status === "authenticated" ? (
             <div className="flex flex-col space-y-4">
-              <span className="text-lg font-semibold text-orange-400 text-center">
+              <Link
+                href="/dashboard"
+                onClick={() => setIsOpen(false)}
+                className={`text-lg font-semibold text-center transition-colors duration-300 ${
+                  pathname === "/dashboard" ? "text-orange-400" : "text-orange-400 hover:text-orange-300"
+                }`}
+                aria-current={pathname === "/dashboard" ? "page" : undefined}
+              >
                 {session.user.name}
-              </span>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="block w-full text-center bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 px-6 py-3 rounded-full font-semibold text-sm uppercase tracking-wider transition-all duration-300 transform hover:scale-105 active:scale-95"
