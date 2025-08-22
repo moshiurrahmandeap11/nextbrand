@@ -20,7 +20,7 @@ const ProductDetails = () => {
 
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`/api/products?id=${id}`);
+        const res = await fetch(`https://nextbrand-five.vercel.app/api/products?id=${id}`);
         if (!res.ok) {
           throw new Error("Failed to fetch product data.");
         }
